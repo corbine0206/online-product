@@ -25,8 +25,8 @@ class SalesDashboardController extends Controller
 
         // Get date range from request or default to last 30 days
         $startDate = $validated['start_date'] ?? Carbon::now()->subDays(30)->format('Y-m-d');
-        $endDate = $validated['end_date'] ?? Carbon::now()->format('Y-m-d');
-        
+        $endDate = ($validated['end_date'] ?? Carbon::now()->format('Y-m-d')) . ' 23:59:59'; // Include full end day
+
         // Security: Limit date range to prevent performance issues
         $maxDays = 365;
         $dateDiff = Carbon::parse($startDate)->diffInDays(Carbon::parse($endDate));
@@ -92,6 +92,7 @@ class SalesDashboardController extends Controller
 
         // Recent Transactions
         $recentTransactions = SalesTransaction::with('customer')
+            ->whereBetween('transaction_date', [$startDate, $endDate])
             ->where('status', 'completed')
             ->orderBy('transaction_date', 'desc')
             ->take(10)
@@ -119,16 +120,16 @@ class SalesDashboardController extends Controller
             return redirect()->back()->with('error', 'Invalid export format');
         }
 
-        // Validate other input
+        // Validate other input - require dates to match dashboard
         $validated = $request->validate([
-            'start_date' => 'nullable|date|before_or_equal:end_date|before_or_equal:today',
-            'end_date' => 'nullable|date|after_or_equal:start_date|before_or_equal:today',
+            'start_date' => 'required|date|before_or_equal:end_date|before_or_equal:today',
+            'end_date' => 'required|date|after_or_equal:start_date|before_or_equal:today',
         ], [
             'start_date.before_or_equal' => 'Start date must be before or equal to end date',
             'end_date.after_or_equal' => 'End date must be after or equal to start date',
         ]);
-        $startDate = $validated['start_date'] ?? Carbon::now()->subDays(30)->format('Y-m-d');
-        $endDate = $validated['end_date'] ?? Carbon::now()->format('Y-m-d');
+        $startDate = $validated['start_date'];
+        $endDate = $validated['end_date'] . ' 23:59:59'; // Include full end day
         
         // Security: Limit date range to prevent performance issues
         $maxDays = 365;
@@ -137,14 +138,6 @@ class SalesDashboardController extends Controller
             return redirect()->back()
                 ->with('error', "Date range cannot exceed {$maxDays} days for export.");
         }
-        
-        // Rate limiting: Prevent excessive exports
-        $cacheKey = 'export_' . auth()->id() . '_' . $format;
-        if (cache()->has($cacheKey)) {
-            return redirect()->back()
-                ->with('error', 'Please wait before generating another report. Reports can be generated once per minute.');
-        }
-        cache()->put($cacheKey, true, 60); // 1 minute cache
 
         $transactions = SalesTransaction::with('customer')
             ->whereBetween('transaction_date', [$startDate, $endDate])
@@ -161,12 +154,15 @@ class SalesDashboardController extends Controller
 
     private function exportPDF($transactions, $startDate, $endDate)
     {
-        // For now, return a simple view that can be printed
-        return view('admin.sales-dashboard.pdf-report', compact(
+        $pdf = \PDF::loadView('admin.sales-dashboard.pdf-report', compact(
             'transactions',
             'startDate',
             'endDate'
         ));
+        
+        $filename = "sales-report-{$startDate}-to-{$endDate}.pdf";
+        
+        return $pdf->download($filename);
     }
 
     private function exportExcel($transactions, $startDate, $endDate)

@@ -5,8 +5,10 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 20px;
             color: #333;
+            font-size: 12px;
         }
         .header {
             text-align: center;
@@ -14,35 +16,63 @@
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        .header h2 {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            color: #7f8c8d;
+        }
         .report-info {
             text-align: center;
             margin-bottom: 30px;
             color: #666;
+            font-size: 14px;
         }
         .summary {
             margin-bottom: 30px;
         }
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 4px;
+        .summary h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #2c3e50;
         }
-        table {
+        .summary-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
-        th, td {
+        .summary-table td {
+            padding: 10px;
             border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
         }
-        th {
+        .summary-table td:first-child {
+            font-weight: bold;
+            width: 50%;
+        }
+        .summary-table td:last-child {
+            text-align: right;
+            font-weight: bold;
+        }
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .transaction-table th, 
+        .transaction-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 11px;
+        }
+        .transaction-table th {
             background-color: #f2f2f2;
             font-weight: bold;
+            font-size: 11px;
         }
         .text-right {
             text-align: right;
@@ -54,18 +84,29 @@
             margin-top: 50px;
             text-align: center;
             color: #666;
-            font-size: 12px;
+            font-size: 11px;
+            page-break-inside: avoid;
         }
-        @media print {
-            .no-print {
-                display: none;
-            }
-            body {
-                margin: 10px;
-            }
-            .page-break {
-                page-break-before: always;
-            }
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+        .status-failed {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
         }
     </style>
 </head>
@@ -82,22 +123,24 @@
 
     <div class="summary">
         <h3>Summary</h3>
-        <div class="summary-row">
-            <span>Total Transactions:</span>
-            <span>{{ $transactions->count() }}</span>
-        </div>
-        <div class="summary-row">
-            <span>Total Sales:</span>
-            <span class="text-right">${{ number_format($transactions->sum('total_amount'), 2) }}</span>
-        </div>
-        <div class="summary-row">
-            <span>Average Transaction:</span>
-            <span class="text-right">${{ number_format($transactions->avg('total_amount'), 2) }}</span>
-        </div>
+        <table class="summary-table">
+            <tr>
+                <td>Total Transactions:</td>
+                <td class="text-right">{{ $transactions->count() }}</td>
+            </tr>
+            <tr>
+                <td>Total Sales:</td>
+                <td class="text-right">${{ number_format($transactions->sum('total_amount'), 2) }}</td>
+            </tr>
+            <tr>
+                <td>Average Transaction:</td>
+                <td class="text-right">${{ number_format($transactions->avg('total_amount'), 2) }}</td>
+            </tr>
+        </table>
     </div>
 
     <h3>Transaction Details</h3>
-    <table>
+    <table class="transaction-table">
         <thead>
             <tr>
                 <th>Transaction #</th>
@@ -118,12 +161,13 @@
                     <td class="text-right">${{ number_format($transaction->total_amount, 2) }}</td>
                     <td>{{ ucfirst($transaction->payment_method) }}</td>
                     <td>
-                        <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; 
-                              @if($transaction->status === 'completed') background-color: #d4edda; color: #155724;
-                              @elseif($transaction->status === 'pending') background-color: #fff3cd; color: #856404;
-                              @else background-color: #f8d7da; color: #721c24; @endif">
-                            {{ ucfirst($transaction->status) }}
-                        </span>
+                        @if($transaction->status === 'completed')
+                            <span class="status-completed">Completed</span>
+                        @elseif($transaction->status === 'pending')
+                            <span class="status-pending">Pending</span>
+                        @else
+                            <span class="status-failed">{{ ucfirst($transaction->status) }}</span>
+                        @endif
                     </td>
                     <td>{{ $transaction->transaction_date->format('M d, Y H:i') }}</td>
                 </tr>
@@ -138,15 +182,6 @@
     <div class="footer">
         <p>This report was generated automatically from the Online Product Management System.</p>
         <p>For questions or concerns, please contact the system administrator.</p>
-    </div>
-
-    <div class="no-print">
-        <button onclick="window.print()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
-            Print Report
-        </button>
-        <button onclick="window.close()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
-            Close
-        </button>
     </div>
 </body>
 </html>
