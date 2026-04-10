@@ -37,12 +37,10 @@ class SalesDashboardController extends Controller
         }
 
         // Basic Statistics
-        $totalSales = SalesTransaction::whereBetween('transaction_date', [$startDate, $endDate])
-            ->where('status', 'completed')
+        $totalSales = SalesTransaction::where('status', 'completed')
             ->sum('total_amount');
 
-        $totalTransactions = SalesTransaction::whereBetween('transaction_date', [$startDate, $endDate])
-            ->where('status', 'completed')
+        $totalTransactions = SalesTransaction::where('status', 'completed')
             ->count();
 
         $averageTransactionValue = $totalTransactions > 0 ? $totalSales / $totalTransactions : 0;
@@ -58,25 +56,30 @@ class SalesDashboardController extends Controller
             ->get();
 
         // Payment Method Breakdown
-        $paymentMethods = SalesTransaction::whereBetween('transaction_date', [$startDate, $endDate])
-            ->where('status', 'completed')
+        $paymentMethods = SalesTransaction::where('status', 'completed')
             ->selectRaw('payment_method, COUNT(*) as count, SUM(total_amount) as total')
             ->groupBy('payment_method')
             ->get();
 
         // Top Customers
-        $topCustomers = Customer::with(['salesTransactions' => function($query) use ($startDate, $endDate) {
-                $query->whereBetween('transaction_date', [$startDate, $endDate])
-                     ->where('status', 'completed');
-            }])
+        $topCustomers = SalesTransaction::where('status', 'completed')
+            ->selectRaw('customer_id, SUM(total_amount) as total_sales, COUNT(*) as transaction_count')
+            ->groupBy('customer_id')
+            ->orderByDesc('total_sales')
+            ->take(10)
             ->get()
-            ->map(function($customer) {
-                $customer->total_sales = $customer->salesTransactions->sum('total_amount');
-                $customer->transaction_count = $customer->salesTransactions->count();
-                return $customer;
+            ->map(function($item) {
+                $customer = Customer::find($item->customer_id);
+                if ($customer) {
+                    $customer->total_sales = $item->total_sales;
+                    $customer->transaction_count = $item->transaction_count;
+                    return $customer;
+                }
+                return null;
             })
-            ->sortByDesc('total_sales')
-            ->take(10);
+            ->filter(function($customer) {
+                return $customer !== null;
+            });
 
         // Monthly Comparison (Last 6 months)
         $monthlyComparison = SalesTransaction::where('transaction_date', '>=', Carbon::now()->subMonths(6))

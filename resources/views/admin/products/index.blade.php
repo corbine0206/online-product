@@ -21,7 +21,7 @@
                 <table class="table table-hover">
                     <thead class="table-light">
                         <tr>
-                            <th>ID</th>
+                            <th>Image</th>
                             <th>Name</th>
                             <th>SKU</th>
                             <th>Price</th>
@@ -35,7 +35,15 @@
                     <tbody>
                         @foreach($products as $product)
                         <tr>
-                            <td>{{ $product->id }}</td>
+                            <td>
+                                @if($product->hasImages())
+                                    <img src="{{ $product->primary_image_url }}" alt="{{ $product->name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                @else
+                                    <div style="width: 50px; height: 50px; background-color: #e9ecef; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-image text-muted"></i>
+                                    </div>
+                                @endif
+                            </td>
                             <td>{{ $product->name }}</td>
                             <td>{{ $product->sku }}</td>
                             <td>${{ number_format($product->price, 2) }}</td>

@@ -58,7 +58,11 @@ class UserManagementController extends Controller
         if ($user->hasRole('admin')) {
             return redirect()->route('admin.users.index')->with('error', 'Cannot edit admin users.');
         }
-        return view('admin.users.edit', compact('user'));
+        
+        $roles = \App\Models\Role::all();
+        $userRoles = $user->roles->pluck('id')->toArray();
+        
+        return view('admin.users.edit', compact('user', 'roles', 'userRoles'));
     }
 
     /**
@@ -74,9 +78,16 @@ class UserManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'is_active' => 'boolean',
+            'roles' => 'array',
+            'roles.*' => 'exists:roles,id',
         ]);
 
         $user->update($validated);
+
+        // Sync roles
+        if (isset($validated['roles'])) {
+            $user->syncRoles($validated['roles']);
+        }
 
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully!');
     }

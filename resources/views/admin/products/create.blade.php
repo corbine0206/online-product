@@ -19,7 +19,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('admin.products.store') }}" method="POST">
+                    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <div class="row">
@@ -91,9 +91,20 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="image_url" class="form-label">Image URL</label>
+                            <label for="images" class="form-label">Product Images</label>
+                            <input type="file" class="form-control @error('images') is-invalid @enderror" 
+                                   id="images" name="images[]" multiple accept="image/*">
+                            <div class="form-text">Upload up to 5 images (JPEG, PNG, JPG, GIF). Maximum 2MB per image.</div>
+                            @error('images')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image_url" class="form-label">Or Image URL</label>
                             <input type="url" class="form-control @error('image_url') is-invalid @enderror" 
-                                   id="image_url" name="image_url" value="{{ old('image_url') }}">
+                                   id="image_url" name="image_url" value="{{ old('image_url') }}" placeholder="https://example.com/image.jpg">
+                            <div class="form-text">Alternative: Provide image URL instead of uploading files.</div>
                             @error('image_url')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

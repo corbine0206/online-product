@@ -61,7 +61,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('admin.`roles.index') }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary">Update Role</button>
                         </div>
                     </form>

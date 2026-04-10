@@ -19,7 +19,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('admin.products.update', $product) }}" method="POST">
+                    <form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -91,10 +91,58 @@
                             </div>
                         </div>
 
+                        <!-- Existing Images -->
+                        @if($product->images->isNotEmpty())
+                        <div class="mb-4">
+                            <label class="form-label">Current Images</label>
+                            <div class="row">
+                                @foreach($product->images->sortBy('sort_order')->sortBy('id') as $image)
+                                <div class="col-md-3 mb-3">
+                                    <div class="card">
+                                        <img src="{{ $image->image_url }}" class="card-img-top" style="height: 150px; object-fit: cover;" alt="{{ $image->image_name }}">
+                                        <div class="card-body p-2">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">{{ strlen($image->image_name) > 15 ? substr($image->image_name, 0, 15) . '...' : $image->image_name }}</small>
+                                                <div class="btn-group btn-group-sm">
+                                                    @if(!$image->is_primary)
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" title="Set as primary" 
+                                                            onclick="setPrimaryImage({{ $image->id }})">
+                                                        <i class="fas fa-star"></i>
+                                                    </button>
+                                                    @else
+                                                    <span class="badge bg-primary" title="Primary image">
+                                                        <i class="fas fa-star"></i>
+                                                    </span>
+                                                    @endif
+                                                    <button type="button" class="btn btn-outline-danger btn-sm" title="Delete"
+                                                            onclick="deleteImage({{ $image->id }})">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+
                         <div class="mb-3">
-                            <label for="image_url" class="form-label">Image URL</label>
+                            <label for="images" class="form-label">Add More Images</label>
+                            <input type="file" class="form-control @error('images') is-invalid @enderror" 
+                                   id="images" name="images[]" multiple accept="image/*">
+                            <div class="form-text">Upload up to 5 images (JPEG, PNG, JPG, GIF). Maximum 2MB per image.</div>
+                            @error('images')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image_url" class="form-label">Or Image URL</label>
                             <input type="url" class="form-control @error('image_url') is-invalid @enderror" 
-                                   id="image_url" name="image_url" value="{{ old('image_url', $product->image_url) }}">
+                                   id="image_url" name="image_url" value="{{ old('image_url', $product->image_url) }}" placeholder="https://example.com/image.jpg">
+                            <div class="form-text">Alternative: Provide image URL instead of uploading files.</div>
                             @error('image_url')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -114,6 +162,40 @@
                             <i class="fas fa-save"></i> Update Product
                         </button>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden forms for image management -->
+<form id="setPrimaryForm" method="POST" style="display: none;">
+    @csrf
+    @method('PUT')
+</form>
+
+<form id="deleteImageForm" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
+<script>
+function setPrimaryImage(imageId) {
+    if (confirm('Are you sure you want to set this as the primary image?')) {
+        const form = document.getElementById('setPrimaryForm');
+        form.action = '{{ route('admin.product-images.set-primary', ':imageId') }}'.replace(':imageId', imageId);
+        form.submit();
+    }
+}
+
+function deleteImage(imageId) {
+    if (confirm('Are you sure you want to delete this image?')) {
+        const form = document.getElementById('deleteImageForm');
+        form.action = '{{ route('admin.product-images.delete', ':imageId') }}'.replace(':imageId', imageId);
+        form.submit();
+    }
+}
+</script>
                 </div>
             </div>
         </div>

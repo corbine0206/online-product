@@ -51,6 +51,24 @@
                             </div>
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-label">Roles</label>
+                            <div class="border rounded p-3 bg-light">
+                                @foreach($roles as $role)
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" 
+                                               id="role_{{ $role->id }}" 
+                                               name="roles[]" 
+                                               value="{{ $role->id }}"
+                                               @if(in_array($role->id, $userRoles)) checked @endif>
+                                        <label class="form-check-label" for="role_{{ $role->id }}">
+                                            {{ $role->name }} - {{ $role->description }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn btn-primary w-100">
                             <i class="fas fa-save"></i> Update User
                         </button>
