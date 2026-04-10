@@ -14,7 +14,7 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || !Auth::user()->hasRole('admin')) {
+        if (!Auth::check() || !Auth::user()->hasRole('Super Admin')) {
             return redirect()->route('admin.login')->with('error', 'Unauthorized access.');
         }
 

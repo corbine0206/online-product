@@ -11,7 +11,7 @@
                     <h5 class="mb-0">Edit Sales Transaction</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('sales-transactions.update', $salesTransaction) }}" method="POST">
+                    <form action="{{ route('admin.sales-transactions.update', $salesTransaction) }}" method="POST">
                         @csrf
                         @method('PUT')
                         
@@ -161,7 +161,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('sales-transactions.index') }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ route('admin.sales-transactions.index') }}" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary">Update Transaction</button>
                         </div>
                     </form>

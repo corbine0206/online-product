@@ -10,10 +10,10 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Customer Details</h5>
                     <div>
-                        <a href="{{ route('customers.edit', $customer) }}" class="btn btn-primary">
+                        <a href="{{ route('admin.customers.edit', $customer) }}" class="btn btn-primary">
                             <i class="fas fa-edit"></i> Edit
                         </a>
-                        <a href="{{ route('customers.index') }}" class="btn btn-secondary">
+                        <a href="{{ route('admin.customers.index') }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                     </div>

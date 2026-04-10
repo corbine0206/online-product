@@ -11,7 +11,7 @@
                     <h5 class="mb-0">Create New Role</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('roles.store') }}" method="POST">
+                    <form action="{{ route('admin.roles.store') }}" method="POST">
                         @csrf
                         
                         <div class="mb-3">
@@ -60,7 +60,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('roles.index') }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary">Create Role</button>
                         </div>
                     </form>

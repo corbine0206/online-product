@@ -4,6 +4,11 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\ProductManagementController;
+use App\Http\Controllers\Admin\SalesDashboardController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\SalesTransactionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,5 +31,25 @@ Route::prefix('admin')->name('admin.')->group(function () {
         
         // Product management
         Route::resource('products', ProductManagementController::class);
+        
+        // Customer management
+        Route::resource('customers', CustomerController::class);
+        
+        // Role management
+        Route::resource('roles', RoleController::class);
+        
+        // Permission management
+        Route::resource('permissions', PermissionController::class);
+        
+        // Sales transaction management
+        Route::resource('sales-transactions', SalesTransactionController::class);
+        
+        // Sales dashboard
+        Route::get('sales-dashboard', [SalesDashboardController::class, 'index'])
+            ->middleware('permission:view_reports')
+            ->name('sales-dashboard.index');
+        Route::get('sales-dashboard/export/{format}', [SalesDashboardController::class, 'exportReport'])
+            ->middleware('permission:view_reports')
+            ->name('sales-dashboard.export');
     });
 });

@@ -51,7 +51,7 @@ class RoleController extends Controller
             $role->permissions()->attach($validated['permissions']);
         }
 
-        return redirect()->route('roles.index')
+        return redirect()->route('admin.roles.index')
             ->with('success', 'Role created successfully.');
     }
 
@@ -98,7 +98,7 @@ class RoleController extends Controller
 
         $role->permissions()->sync($validated['permissions'] ?? []);
 
-        return redirect()->route('roles.index')
+        return redirect()->route('admin.roles.index')
             ->with('success', 'Role updated successfully.');
     }
 
@@ -110,7 +110,7 @@ class RoleController extends Controller
         $role->permissions()->detach();
         $role->delete();
 
-        return redirect()->route('roles.index')
+        return redirect()->route('admin.roles.index')
             ->with('success', 'Role deleted successfully.');
     }
 }

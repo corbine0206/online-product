@@ -11,7 +11,7 @@
                     <h5 class="mb-0">Edit Permission</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('permissions.update', $permission) }}" method="POST">
+                    <form action="{{ route('admin.permissions.update', $permission) }}" method="POST">
                         @csrf
                         @method('PUT')
                         
@@ -34,7 +34,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('permissions.index') }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ route('admin.permissions.index') }}" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary">Update Permission</button>
                         </div>
                     </form>

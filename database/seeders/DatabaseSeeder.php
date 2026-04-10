@@ -19,63 +19,34 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create roles
-        $adminRole = Role::firstOrCreate(
-            ['name' => 'admin'],
-            ['description' => 'Administrator with full access']
-        );
-
-        $userRole = Role::firstOrCreate(
-            ['name' => 'user'],
-            ['description' => 'Regular user']
-        );
-
-        $moderatorRole = Role::firstOrCreate(
-            ['name' => 'moderator'],
-            ['description' => 'Moderator with limited admin tasks']
-        );
-
-        // Create permissions
-        $permissions = [
-            ['name' => 'view.dashboard', 'description' => 'View admin dashboard'],
-            ['name' => 'manage.users', 'description' => 'Create, edit, delete users'],
-            ['name' => 'view.users', 'description' => 'View users list'],
-            ['name' => 'manage.products', 'description' => 'Create, edit, delete products'],
-            ['name' => 'view.products', 'description' => 'View products list'],
-            ['name' => 'manage.roles', 'description' => 'Manage roles and permissions'],
-        ];
-
-        foreach ($permissions as $perm) {
-            Permission::firstOrCreate(['name' => $perm['name']], ['description' => $perm['description']]);
-        }
-
-        // Assign permissions to admin role (all permissions)
-        $adminPermissions = Permission::all();
-        $adminRole->permissions()->sync($adminPermissions->pluck('id')->toArray());
-
-        // Assign permissions to moderator role
-        $moderatorPermissions = Permission::whereIn('name', [
-            'view.dashboard',
-            'view.users',
-            'view.products',
-        ])->get();
-        $moderatorRole->permissions()->sync($moderatorPermissions->pluck('id')->toArray());
+        $this->call([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+            CustomerSeeder::class,
+            SalesTransactionSeeder::class,
+        ]);
 
         // Create admin user
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name' => 'Admin User',
-                'password' => Hash::make('password'),
-                'is_active' => true,
-            ]
-        );
-        $admin->syncRoles([$adminRole->id]);
+        $adminRole = Role::where('name', 'Super Admin')->first();
+        if ($adminRole) {
+            $admin = User::firstOrCreate(
+                ['email' => 'admin@example.com'],
+                [
+                    'name' => 'Admin User',
+                    'password' => Hash::make('password'),
+                    'is_active' => true,
+                ]
+            );
+            $admin->syncRoles([$adminRole->id]);
+        }
 
         // Create some demo regular users
-        User::factory(5)->create()->each(function ($user) use ($userRole) {
-            $user->syncRoles([$userRole->id]);
-        });
+        $userRole = Role::where('name', 'Sales Staff')->first();
+        if ($userRole) {
+            User::factory(5)->create()->each(function ($user) use ($userRole) {
+                $user->syncRoles([$userRole->id]);
+            });
+        }
 
         // Create some demo products
         $products = [

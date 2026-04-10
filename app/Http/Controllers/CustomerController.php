@@ -49,7 +49,7 @@ class CustomerController extends Controller
 
         Customer::create($validated);
 
-        return redirect()->route('customers.index')
+        return redirect()->route('admin.customers.index')
             ->with('success', 'Customer created successfully.');
     }
 
@@ -95,7 +95,7 @@ class CustomerController extends Controller
 
         $customer->update($validated);
 
-        return redirect()->route('customers.index')
+        return redirect()->route('admin.customers.index')
             ->with('success', 'Customer updated successfully.');
     }
 
@@ -105,13 +105,13 @@ class CustomerController extends Controller
     public function destroy(Customer $customer)
     {
         if ($customer->salesTransactions()->exists()) {
-            return redirect()->route('customers.index')
+            return redirect()->route('admin.customers.index')
                 ->with('error', 'Cannot delete customer with existing sales transactions.');
         }
 
         $customer->delete();
 
-        return redirect()->route('customers.index')
+        return redirect()->route('admin.customers.index')
             ->with('success', 'Customer deleted successfully.');
     }
 }

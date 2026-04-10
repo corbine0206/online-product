@@ -11,7 +11,7 @@
                     <h5 class="mb-0">Create New Customer</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('customers.store') }}" method="POST">
+                    <form action="{{ route('admin.customers.store') }}" method="POST">
                         @csrf
                         
                         <div class="row">
@@ -138,9 +138,13 @@
                             @enderror
                         </div>
 
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ route('customers.index') }}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Create Customer</button>
+                        <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
+                            <a href="{{ route('admin.customers.index') }}" class="btn btn-secondary btn-sm btn-sm-block">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-sm btn-sm-block">
+                                <i class="fas fa-save"></i> Create Customer
+                            </button>
                         </div>
                     </form>
                 </div>

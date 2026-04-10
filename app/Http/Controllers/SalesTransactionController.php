@@ -52,7 +52,7 @@ class SalesTransactionController extends Controller
 
         $transaction = SalesTransaction::create($validated);
 
-        return redirect()->route('sales-transactions.show', $transaction)
+        return redirect()->route('admin.sales-transactions.show', $transaction)
             ->with('success', 'Sales transaction created successfully.');
     }
 
@@ -96,7 +96,7 @@ class SalesTransactionController extends Controller
 
         $salesTransaction->update($validated);
 
-        return redirect()->route('sales-transactions.show', $salesTransaction)
+        return redirect()->route('admin.sales-transactions.show', $salesTransaction)
             ->with('success', 'Sales transaction updated successfully.');
     }
 
@@ -106,13 +106,13 @@ class SalesTransactionController extends Controller
     public function destroy(SalesTransaction $salesTransaction)
     {
         if ($salesTransaction->status === 'completed') {
-            return redirect()->route('sales-transactions.index')
+            return redirect()->route('admin.sales-transactions.index')
                 ->with('error', 'Cannot delete completed sales transaction.');
         }
 
         $salesTransaction->delete();
 
-        return redirect()->route('sales-transactions.index')
+        return redirect()->route('admin.sales-transactions.index')
             ->with('success', 'Sales transaction deleted successfully.');
     }
 }

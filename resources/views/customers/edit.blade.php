@@ -11,7 +11,7 @@
                     <h5 class="mb-0">Edit Customer</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('customers.update', $customer) }}" method="POST">
+                    <form action="{{ route('admin.customers.update', $customer) }}" method="POST">
                         @csrf
                         @method('PUT')
                         
@@ -139,9 +139,13 @@
                             @enderror
                         </div>
 
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ route('customers.index') }}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Update Customer</button>
+                        <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
+                            <a href="{{ route('admin.customers.index') }}" class="btn btn-secondary btn-sm btn-sm-block">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-sm btn-sm-block">
+                                <i class="fas fa-save"></i> Update Customer
+                            </button>
                         </div>
                     </form>
                 </div>
