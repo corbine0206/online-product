@@ -15,10 +15,10 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\SalesTransactionController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Products routes
-Route::get('products', [App\Http\Controllers\HomeController::class, 'index'])->name('products.index');
+Route::get('products', [HomeController::class, 'index'])->name('products.index');
 
 // Customer authentication routes
 Route::get('register', [AuthController::class, 'showRegister'])->name('register');
@@ -28,26 +28,26 @@ Route::post('login', [AuthController::class, 'login']);
 Route::match(['get', 'post'], 'logout', [AuthController::class, 'logout'])->name('logout');
 
 // Cart routes (accessible to all users)
-Route::get('cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
-Route::post('cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
-Route::put('cart/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
-Route::delete('cart/remove', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+Route::get('cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::put('cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::delete('cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
 // Customer protected routes
 Route::middleware('customer')->group(function () {
     Route::get('dashboard', [AuthController::class, 'dashboard'])->name('customer.dashboard');
-    Route::get('checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
-    Route::post('checkout/process', [App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
-    Route::get('checkout/success', [App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+    Route::get('checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
 });
 
 // Sales staff routes
 Route::middleware(['customer', 'role:sales'])->group(function () {
-    Route::get('sales-dashboard', [App\Http\Controllers\Admin\SalesDashboardController::class, 'index'])->name('sales.dashboard');
-    Route::get('customers', [App\Http\Controllers\CustomerController::class, 'index'])->name('customers.index')->middleware('permission:view_customers');
-    Route::get('customers/{customer}', [App\Http\Controllers\CustomerController::class, 'show'])->name('customers.show')->middleware('permission:view_customer_details');
-    Route::get('customers/{customer}/edit', [App\Http\Controllers\CustomerController::class, 'edit'])->name('customers.edit')->middleware('permission:edit_customers');
-    Route::put('customers/{customer}', [App\Http\Controllers\CustomerController::class, 'update'])->name('customers.update')->middleware('permission:edit_customers');
+    Route::get('sales-dashboard', [Admin\SalesDashboardController::class, 'index'])->name('sales.dashboard');
+    Route::get('customers', [CustomerController::class, 'index'])->name('customers.index')->middleware('permission:view_customers');
+    Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('customers.show')->middleware('permission:view_customer_details');
+    Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit')->middleware('permission:edit_customers');
+    Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('customers.update')->middleware('permission:edit_customers');
 });
 
 // Admin Routes
